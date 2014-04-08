@@ -46,6 +46,10 @@ void loop()
 			case 'T':
 				Serial.print("OK");
 				break;
+			case 'V':
+				Serial.print("0.0.1");
+				Serial.print("OK");
+				break;
 			default:
 				// test test
 				break;
