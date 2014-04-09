@@ -1,7 +1,7 @@
 #include <SPI.h>
 #include <Flash.h>
 
-// debug mode activation derective: 1 = on, 0 = off
+// Debug mode activation directive: 1 = on, 0 = off
 #define DEBUG 0
 
 #define WREN 0x06
@@ -28,23 +28,31 @@ int availableMemory()
 
 void erase_all(){
     #if DEBUG == 1
-      Serial.print("Erasing...\n");
+      Serial.print("\nErasing...\n");
     #endif
     // erasing
     #if DEBUG == 1
-      Serial.print("Erasing...ok\n");
+      Serial.print("\nErasing...ok\n");
     #endif
 }
 
 void reset(){
     #if DEBUG == 1
-      Serial.print("Resetting...\n");
+      Serial.print("\nResetting...\n");
+    #endif
+    // resetting
+    #if DEBUG == 1
+      Serial.print("\nResetting...ok\n");
     #endif
 }
 
 void read_all(){
     #if DEBUG == 1
-      Serial.print("Reading/dumping ROM data...\n");
+      Serial.print("\nReading/dumping ROM data...\n");
+    #endif
+    // reading data
+    #if DEBUG == 1
+      Serial.print("\nReading/dumping ROM data...done\n");
     #endif
 }
 
@@ -67,6 +75,10 @@ void receive_flash_size(){
 void receive_flash_data(){
   #if DEBUG == 1
     Serial.print("Waiting for data...");
+  #endif
+  // receive flash data
+  #if DEBUG == 1
+    Serial.print("Got data ok.");
   #endif
 }
 
