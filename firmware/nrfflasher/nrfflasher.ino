@@ -1,22 +1,41 @@
+/**
+      nrfFlasher firmware code. 
+      
+      author: volodink
+*/
+
+// Include necessary headers
 #include <SPI.h>
 #include <Flash.h>
 
 // Debug mode activation directive: 1 = on, 0 = off
 #define DEBUG 0
 
+// Define operation modes for work with nrf24le1 memory 
 #define WREN 0x06
 #define ERASEPAGE 0x52
 #define PROGRAM 0x02
 #define READ 0x03
 
+// Creating strings in atmega's ROM
+FLASH_STRING(nrfflasher_version, "0.0.1");
+FLASH_STRING(erasing,      "\nErasing...\n");
+FLASH_STRING(erasing_ok,   "\nErasing...ok\n");
+FLASH_STRING(resetting,    "\nResetting...\n");
+FLASH_STRING(resetting_ok, "\nResetting...ok\n");
+FLASH_STRING(reading,    "\nReading/dumping ROM data...\n");
+FLASH_STRING(reading_ok, "\nReading/dumping ROM data...ok\n");
+
+// Pin definitions for nrf24le1 chip
 int NRF_RESET = 9;
 int NRF_PROG  = 8;
 int FCSN = 10;
 
+// Number of bytes to write to nrf24le1
 unsigned long int firmwareFlashSize = 0;
 
-FLASH_STRING(nrfflasher_version, "0.0.1");
-
+/**
+*/
 int availableMemory() 
 {
   int size = 1024;
@@ -26,40 +45,56 @@ int availableMemory()
   return size;
 }
 
+/**
+*/
 void erase_all(){
     #if DEBUG == 1
-      Serial.print("\nErasing...\n");
+      erasing.print(Serial);
     #endif
     // erasing
     #if DEBUG == 1
-      Serial.print("\nErasing...ok\n");
+      erasing_ok.print(Serial);
     #endif
 }
 
+/**
+*/
 void reset(){
     #if DEBUG == 1
-      Serial.print("\nResetting...\n");
+      resetting.print(Serial);
     #endif
     // resetting
     #if DEBUG == 1
-      Serial.print("\nResetting...ok\n");
+      resetting_ok.print(Serial);
     #endif
 }
 
+/**
+*/
 void read_all(){
     #if DEBUG == 1
-      Serial.print("\nReading/dumping ROM data...\n");
+      reading.print(Serial);
     #endif
     // reading data
     #if DEBUG == 1
-      Serial.print("\nReading/dumping ROM data...done\n");
+      reading_ok.print(Serial);
     #endif
 }
 
+/**
+*/
 void get_flash_size(){
+    #if DEBUG == 1
+      Serial.print("\nGetting flash size...\n");
+    #endif
     Serial.print(firmwareFlashSize, DEC);
+    #if DEBUG == 1
+      Serial.print("\nGetting flash size...done\n");
+    #endif
 }
 
+/**
+*/
 void receive_flash_size(){
   #if DEBUG == 1
     Serial.print("\nWaiting for flash size...\n");
@@ -72,20 +107,35 @@ void receive_flash_size(){
   #endif
 }
 
+/**
+*/
 void receive_flash_data(){
   #if DEBUG == 1
     Serial.print("Waiting for data...");
   #endif
   // receive flash data
+  /*
+  if (Serial.available() > 0)
+  {
+    while (Serial.available() > 0)
+    {
+      
+    }
+  }  
+  */
   #if DEBUG == 1
     Serial.print("Got data ok.");
   #endif
 }
 
+/**
+*/
 void get_version(){
   nrfflasher_version.print(Serial);
 }
 
+/**
+*/
 void setup(){
   	
 	// Configuration and start the SPI library
@@ -110,7 +160,9 @@ void setup(){
 	// Ready to go!
 } 
 
-// The loop routine runs over and over again forever:
+/**
+  The loop routine runs over and over again forever:
+*/
 int incomingByte = 0;
 void loop(){
 	if (Serial.available() > 0){
@@ -149,7 +201,7 @@ void loop(){
                                 Serial.print("OK");
                                 break;
                         case 'D':
-                                 Serial.print(availableMemory());
+                                 Serial.print(availableMemory()); // get amount of free memory RAM
                                  Serial.print("OK");
 			default:
 				// test test
@@ -157,3 +209,4 @@ void loop(){
 		}
 	}
 }
+
