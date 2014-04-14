@@ -3,7 +3,7 @@ import serial
 from time import sleep
 from sys import argv
 
-def get_args():	# Small command-line parser. Yep it's squared-wheels bicycle
+def get_args(): # Small command-line parser. Yep it's squared-wheels bicycle
 	if not argv[1:]: return {'filename': argv[0]}
 	data = ' '.join(argv[1:])
 	data = data.split(' -')
