@@ -60,8 +60,6 @@ def main():
 
 	if 'e' in start_args: # Erase
 		print 'Erasing...'
-		serial_port.flushInput()
-		serial_port.flushOutput()
 		serial_port.write('E')
 		#serial_port.timeout = 5 # Fuck!
 		sleep(5)
