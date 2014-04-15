@@ -3,7 +3,6 @@ import serial
 from time import sleep
 from sys import argv
 
-debug = False
 open_port_delay = 1.7
 
 def get_args(): # Small command-line parser. Yep it's squared-wheels bicycle
@@ -19,7 +18,7 @@ def device_search():
 	for port_num in range(256):
 		answer = None
 		try:
-			serial_port = serial.Serial(port_num, 9600, timeout=0.1)
+			serial_port = serial.Serial(port_num, 9600, timeout=0.3)
 			sleep(open_port_delay)
 			serial_port.write('T')
 			answer = serial_port.read(2)
@@ -34,6 +33,8 @@ def device_search():
 def main():
 	print 'Hello nrf24LE1! :)'
 	start_args = get_args()
+	if 'verbose' in start_args: debug = True
+	else: debug = False
 	if ('h' in start_args) or (not (('w' in start_args) or ('e' in start_args) or ('r' in start_args))): # Help
 		print "Don't wait help."
 		exit(0)
@@ -48,7 +49,7 @@ def main():
 		exit(1)
 	if debug: print 'Device port:', device_port
 
-	serial_port = serial.Serial(device_port[0], 9600, timeout=0.1) # Open port for random actions
+	serial_port = serial.Serial(device_port[0], 9600, timeout=0.3) # Open port for random actions
 	sleep(open_port_delay)
 	serial_port.write('V')
 	answer = serial_port.read(15)
@@ -74,9 +75,15 @@ def main():
 
 	if 'r' in start_args: # Read
 		print 'Reading...'
+		serial_port.write('R')
+		answer = serial_port.read(16384+2)
+		print answer
 
 	if 'w' in start_args: # Write
 		print 'Writing...'
+	
+	if 'v' in start_args: # Verify
+		print 'Verifying...'
 
 	serial_port.close()
 
