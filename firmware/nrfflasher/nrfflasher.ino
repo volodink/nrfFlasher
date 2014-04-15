@@ -155,13 +155,14 @@ void setup(){
 	digitalWrite(NRF_RESET, HIGH);  
 	
 	// Start delay
-	delay(1000);
+	delay(100);
 	
 	// Ready to go!
+
 } 
 
 /**
-  The loop routine runs over and over again forever:
+  The loop routine runs over and over again forever
 */
 int incomingByte = 0;
 void loop(){
