@@ -1,7 +1,10 @@
-﻿#! /usr/bin/env python
+#! /usr/bin/env python
 import serial
 from time import sleep
 from sys import argv
+
+debug = False
+open_port_delay = 1.7
 
 def get_args(): # Small command-line parser. Yep it's squared-wheels bicycle
 	if not argv[1:]: return {'filename': argv[0]}
@@ -17,7 +20,7 @@ def device_search():
 		answer = None
 		try:
 			serial_port = serial.Serial(port_num, 9600, timeout=0.1)
-			sleep(2.6)
+			sleep(open_port_delay)
 			serial_port.write('T')
 			answer = serial_port.read(2)
 			port_name = serial_port.portstr
@@ -29,23 +32,51 @@ def device_search():
 	return None
 
 def main():
-	print get_args()
-	exit()
-	print 'Hello nrf24LE1! :)\n'
+	print 'Hello nrf24LE1! :)'
+	start_args = get_args()
+	if ('h' in start_args) or (not (('w' in start_args) or ('e' in start_args))): # Help
+		print "Don't wait help."
+		exit(0)
+	if ((('w' in start_args) and ('r' in start_args)) or
+		(('w' in start_args) and ('e' in start_args)) or
+		(('r' in start_args) and ('e' in start_args))):
+		print 'What the fuck are you doing?!'
+		exit(666)
 	device_port = device_search()
 	if not device_port:
 		print '404 Device Not Found'
 		exit(1)
-	print 'Device port:', device_port
-	serial_port = serial.Serial(device_port[0], 9600, timeout=0.1)
-	sleep(2.6)
+	if debug: print 'Device port:', device_port
+
+	serial_port = serial.Serial(device_port[0], 9600, timeout=0.1) # Open port for random actions
+	sleep(open_port_delay)
 	serial_port.write('V')
 	answer = serial_port.read(15)
-	serial_port.close()
 	if answer[-2:] <> 'OK':
 		print '502 Bad Device'
 		exit(2)
-	print 'Device f/w version:', answer[:-2]
+	if debug: print 'Device f/w version:', answer[:-2]
+	if debug: print start_args	# e - erase; w - write; r - read;
+
+	if 'e' in start_args: # Erase
+		print 'Erasing...'
+		serial_port.write('E')
+		serial_port.timeout = 5
+		answer = serial_port.read(2)
+		if answer == 'OK':
+			print 'Yahoo!'
+			exit(0)
+		else:
+			print 'Erasing error!'
+			exit(3)
+
+	if 'r' in start_args: # Read
+		print 'Reading...'
+
+	if 'w' in start_args: # Write
+		print 'Writing...'
+
+	serial_port.close()
 
 if __name__ == '__main__':
 	main()
