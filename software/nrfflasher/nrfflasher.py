@@ -60,6 +60,8 @@ def main():
 
 	if 'e' in start_args: # Erase
 		print 'Erasing...'
+		serial_port.flushInput()
+		serial_port.flushOutput()
 		serial_port.write('E')
 		serial_port.timeout = 5
 		answer = serial_port.read(2)
@@ -69,6 +71,7 @@ def main():
 		else:
 			print 'Erasing error!'
 			exit(3)
+		serial_port.timeout = 0.1
 
 	if 'r' in start_args: # Read
 		print 'Reading...'
