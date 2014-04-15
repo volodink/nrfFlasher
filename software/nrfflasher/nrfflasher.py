@@ -34,7 +34,7 @@ def device_search():
 def main():
 	print 'Hello nrf24LE1! :)'
 	start_args = get_args()
-	if ('h' in start_args) or (not (('w' in start_args) or ('e' in start_args))): # Help
+	if ('h' in start_args) or (not (('w' in start_args) or ('e' in start_args) or ('r' in start_args))): # Help
 		print "Don't wait help."
 		exit(0)
 	if ((('w' in start_args) and ('r' in start_args)) or
@@ -63,7 +63,8 @@ def main():
 		serial_port.flushInput()
 		serial_port.flushOutput()
 		serial_port.write('E')
-		serial_port.timeout = 5
+		#serial_port.timeout = 5 # Fuck!
+		sleep(5)
 		answer = serial_port.read(2)
 		if answer == 'OK':
 			print 'Yahoo!'
