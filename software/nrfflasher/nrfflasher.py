@@ -77,13 +77,24 @@ def main():
 		print 'Reading...'
 		serial_port.write('R')
 		answer = serial_port.read(16384+2)
+		if answer[-2:] <> 'OK':
+			print 'Reading error!'
+			exit(4)
 		print answer
 
 	if 'w' in start_args: # Write
 		print 'Writing...'
+		# S size in bytes
+		# L reverse
+		# W bin_stream
 	
 	if 'v' in start_args: # Verify
 		print 'Verifying...'
+		serial_port.write('R')
+		answer = serial_port.read(16384+2)
+		if answer[-2:] <> 'OK':
+			print 'Reading error!'
+			exit(4)
 
 	serial_port.close()
 
