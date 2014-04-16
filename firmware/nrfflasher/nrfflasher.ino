@@ -55,6 +55,7 @@ int availableMemory()
     
     description:
     Performs erase page by its number.
+<<<<<<< HEAD
 */
 void erase_page(unsigned char pagenum)
 {
@@ -83,6 +84,36 @@ void erase_page(unsigned char pagenum)
 
 /**
 */
+=======
+*/
+void erase_page(unsigned char pagenum)
+{
+  digitalWrite(NRF_PROG, HIGH);
+  delay(10);
+  digitalWrite(NRF_RESET, LOW);
+  delay(1);
+  digitalWrite(NRF_RESET, HIGH);
+  delay(1);
+
+  digitalWrite(FCSN, LOW);
+  SPI.transfer(WREN);
+  digitalWrite(FCSN, HIGH);
+  delay(1);
+  digitalWrite(FCSN, LOW);
+  SPI.transfer(ERASEPAGE);
+  SPI.transfer(pagenum);
+  digitalWrite(FCSN, HIGH);
+  delay(10);
+
+  digitalWrite(NRF_PROG, LOW);
+  delay(10);
+  digitalWrite(NRF_RESET, HIGH);
+  delay(10);
+}
+
+/**
+*/
+>>>>>>> 3a47f01456fce4907afcf0be84c45a67bd322fda
 void erase_all()
 {
     int pageCounter = 0;
@@ -294,4 +325,3 @@ void loop(){
 		}
 	}
 }
-
