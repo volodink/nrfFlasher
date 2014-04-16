@@ -35,7 +35,7 @@ def main():
 	start_args = get_args()
 	if 'verbose' in start_args: debug = True
 	else: debug = False
-	if ('h' in start_args) or (not (('w' in start_args) or ('e' in start_args) or ('r' in start_args))): # Help
+	if ('h' in start_args) or (not (('w' in start_args) or ('e' in start_args) or ('r' in start_args) or ('v' in start_args))): # Help
 		print "Don't wait help."
 		exit(0)
 	if ((('w' in start_args) and ('r' in start_args)) or
@@ -71,30 +71,70 @@ def main():
 		else:
 			print 'Erasing error!'
 			exit(3)
-		serial_port.timeout = 0.1
 
 	if 'r' in start_args: # Read
 		print 'Reading...'
+		if not 'file' in start_args:
+			print 'Get the file!'
+			exit(5)
 		serial_port.write('R')
-		answer = serial_port.read(16384+2)
+		answer = ''
+		for i in range(512 * 16):
+			answer += serial_port.read(32)
+			if answer[-2:] == 'OK': break
 		if answer[-2:] <> 'OK':
 			print 'Reading error!'
 			exit(4)
-		print answer
+		answer = answer[:-2]
+		for i in answer:
+			if answer[-1] == chr(255): answer = answer[:-1]
+		print 'Reading complite!\nf/w size: %i bytes' % len(answer)
+		open(start_args['file'], 'wb').write(answer)
 
 	if 'w' in start_args: # Write
 		print 'Writing...'
-		# S size in bytes
-		# L reverse
+		if not 'file' in start_args:
+			print 'Get the file!'
+			exit(5)
+		data = open(start_args['file'], 'rb').read()
+		serial_port.write('S%i' % len(data))
+		sleep(.9)
+		answer = serial_port.read(2)
+		if answer <> 'OK':
+			print 'Size transmissin error!'
+			exit(6)
+		serial_port.write('L')
+		answer = serial_port.read(7)
+		if answer[-2:] <> 'OK':
+			print 'Size transmissin error!'
+			exit(6)
+		answer = answer[:-2]
+		if int(answer) <> len(data):
+			print 'Size != size!'
+			exit(6)
+		if debug: print 'REcived size: %s' % answer
 		# W bin_stream
 	
 	if 'v' in start_args: # Verify
 		print 'Verifying...'
+		if not 'file' in start_args:
+			print 'Get the file!'
+			exit(5)
+		reference_data = open(start_args['file'], 'rb').read()
 		serial_port.write('R')
-		answer = serial_port.read(16384+2)
+		answer = ''
+		for i in range(512 * 16):
+			answer += serial_port.read(32)
+			if answer[-2:] == 'OK': break
+			# Timeout handler
 		if answer[-2:] <> 'OK':
 			print 'Reading error!'
 			exit(4)
+		if reference_data == answer[:len(reference_data)]:
+			print 'Verification success!'
+		else:
+			print 'Verification failed!'
+			
 
 	serial_port.close()
 
