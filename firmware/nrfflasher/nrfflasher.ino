@@ -55,7 +55,6 @@ int availableMemory()
     
     description:
     Performs erase page by its number.
-<<<<<<< HEAD
 */
 void erase_page(unsigned char pagenum)
 {
@@ -84,36 +83,6 @@ void erase_page(unsigned char pagenum)
 
 /**
 */
-=======
-*/
-void erase_page(unsigned char pagenum)
-{
-  digitalWrite(NRF_PROG, HIGH);
-  delay(10);
-  digitalWrite(NRF_RESET, LOW);
-  delay(1);
-  digitalWrite(NRF_RESET, HIGH);
-  delay(1);
-
-  digitalWrite(FCSN, LOW);
-  SPI.transfer(WREN);
-  digitalWrite(FCSN, HIGH);
-  delay(1);
-  digitalWrite(FCSN, LOW);
-  SPI.transfer(ERASEPAGE);
-  SPI.transfer(pagenum);
-  digitalWrite(FCSN, HIGH);
-  delay(10);
-
-  digitalWrite(NRF_PROG, LOW);
-  delay(10);
-  digitalWrite(NRF_RESET, HIGH);
-  delay(10);
-}
-
-/**
-*/
->>>>>>> 3a47f01456fce4907afcf0be84c45a67bd322fda
 void erase_all()
 {
     int pageCounter = 0;
@@ -181,7 +150,6 @@ void read_data()
   delay(1);
 }
 
-
 /**
 */
 void read_all()
@@ -198,7 +166,8 @@ void read_all()
 
 /**
 */
-void get_flash_size(){
+void get_flash_size()
+{
     #if DEBUG == 1
       Serial.print("\nGetting flash size...\n");
     #endif
@@ -210,7 +179,8 @@ void get_flash_size(){
 
 /**
 */
-void receive_flash_size(){
+void receive_flash_size()
+{
   #if DEBUG == 1
     Serial.print("\nWaiting for flash size...\n");
   #endif
@@ -224,7 +194,8 @@ void receive_flash_size(){
 
 /**
 */
-void receive_flash_data(){
+void receive_flash_data()
+{
   #if DEBUG == 1
     Serial.print("Waiting for data...");
   #endif
@@ -245,13 +216,15 @@ void receive_flash_data(){
 
 /**
 */
-void get_version(){
+void get_version()
+{
   nrfflasher_version.print(Serial);
 }
 
 /**
 */
-void setup(){
+void setup()
+{
   	
 	// Configuration and start the SPI library
 	SPI.begin();
@@ -280,45 +253,47 @@ void setup(){
   The loop routine runs over and over again forever
 */
 int incomingByte = 0;
-void loop(){
-	if (Serial.available() > 0){
+void loop()
+{
+	if (Serial.available() > 0)
+	{
 		incomingByte = Serial.read();
 		switch (incomingByte)
-                {
+		{
 			case 'T':                      // test
 				Serial.print("OK");
 				break;
 			case 'V':                      // version
-                                get_version();
+				get_version();
 				Serial.print("OK");
 				break;
-                        case 'E':                      // erase chip  (infopage stays intact)
-                                erase_all();
-                                Serial.print("OK");
-                                break;
-                        case 'A':
-                                reset();               // reset chip
-                                Serial.print("OK");
-                                break;
-                        case 'R':                      // read rom and dump it to the serial out
-                                read_all();
-                                Serial.print("OK");
-                                break;
-                        case 'S':
-                                receive_flash_size();  // receive flash length in bytes
-                                Serial.print("OK");
-                                break;
-                        case 'L':
-                                get_flash_size();
-                                Serial.print("OK");
-                                break;
-                        case 'F':                      // receive flash content
-                                receive_flash_data();
-                                Serial.print("OK");
-                                break;
-                        case 'D':
-                                 Serial.print(availableMemory()); // get amount of free memory RAM
-                                 Serial.print("OK");
+            case 'E':                      // erase chip  (infopage stays intact)
+				erase_all();
+                Serial.print("OK");
+                break;
+            case 'A':
+				reset();               // reset chip
+                Serial.print("OK");
+                break;
+            case 'R':                      // read rom and dump it to the serial out
+				read_all();
+                Serial.print("OK");
+                break;
+            case 'S':
+				receive_flash_size();  // receive flash length in bytes
+                Serial.print("OK");
+                break;
+            case 'L':
+				get_flash_size();
+                Serial.print("OK");
+                break;
+            case 'F':                      // receive flash content
+				receive_flash_data();
+                Serial.print("OK");
+                break;
+            //case 'D':
+			//	Serial.print(availableMemory()); // get amount of free memory RAM
+            //    Serial.print("OK");
 			default:
 				// test test
 				break;
