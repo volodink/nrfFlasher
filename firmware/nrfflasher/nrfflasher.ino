@@ -4,6 +4,11 @@
       author: volodink
 */
 
+/**
+      IMPORTANT NOTES:
+      1. Erasing performed on 0-30 pages for test only. If your firmware is bigger than 30 pages, add 32 in page counter.
+*/
+
 // Include necessary headers
 #include <SPI.h>
 #include <Flash.h>
@@ -46,12 +51,49 @@ int availableMemory()
 }
 
 /**
+    Erase page 
+    
+    description:
+    Performs erase page by its number.
 */
-void erase_all(){
+void erase_page(unsigned char pagenum)
+{
+  digitalWrite(NRF_PROG, HIGH);
+  delay(10);
+  digitalWrite(NRF_RESET, LOW);
+  delay(1);
+  digitalWrite(NRF_RESET, HIGH);
+  delay(1);
+
+  digitalWrite(FCSN, LOW);
+  SPI.transfer(WREN);
+  digitalWrite(FCSN, HIGH);
+  delay(1);
+  digitalWrite(FCSN, LOW);
+  SPI.transfer(ERASEPAGE);
+  SPI.transfer(pagenum);
+  digitalWrite(FCSN, HIGH);
+  delay(10);
+
+  digitalWrite(NRF_PROG, LOW);
+  delay(10);
+  digitalWrite(NRF_RESET, HIGH);
+  delay(10);
+}
+
+/**
+*/
+void erase_all()
+{
+    int pageCounter = 0;
     #if DEBUG == 1
       erasing.print(Serial);
     #endif
     // erasing
+    for (pageCounter = 0; pageCounter < 31; pageCounter++)
+    {
+      erase_page(pageCounter);
+    }
     #if DEBUG == 1
       erasing_ok.print(Serial);
     #endif
@@ -59,7 +101,8 @@ void erase_all(){
 
 /**
 */
-void reset(){
+void reset()
+{
     #if DEBUG == 1
       resetting.print(Serial);
     #endif
@@ -71,11 +114,52 @@ void reset(){
 
 /**
 */
-void read_all(){
+void read_data()
+{
+  unsigned char myChar;
+  
+  digitalWrite(NRF_PROG, HIGH);
+  delay(10);
+  digitalWrite(NRF_RESET, LOW);
+  delay(1);
+  digitalWrite(NRF_RESET, HIGH);
+  delay(1);
+
+  digitalWrite(FCSN, LOW);
+  delay(1);
+  SPI.transfer(READ);
+  SPI.transfer(0);
+  SPI.transfer(0);  
+  //Serial.print("\n");
+  for (int i = 0; i < 15873; i++)
+  {
+    myChar = SPI.transfer(0xFF);
+    Serial.write(myChar);
+    delay(1);
+    //PrintHex8(&myChar, 1);
+    //Serial.print("  ");
+    //if (i % 16 == 0) Serial.print("\n");
+  }
+  
+  digitalWrite(FCSN, HIGH);
+  delay(10);
+
+  digitalWrite(NRF_PROG, LOW);
+  delay(1);
+  digitalWrite(NRF_RESET, HIGH);
+  delay(1);
+}
+
+
+/**
+*/
+void read_all()
+{
     #if DEBUG == 1
       reading.print(Serial);
     #endif
     // reading data
+    read_data();
     #if DEBUG == 1
       reading_ok.print(Serial);
     #endif
@@ -210,4 +294,3 @@ void loop(){
 		}
 	}
 }
-
