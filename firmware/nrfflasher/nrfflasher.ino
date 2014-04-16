@@ -131,7 +131,7 @@ void read_data()
   SPI.transfer(0);
   SPI.transfer(0);  
   //Serial.print("\n");
-  for (int i = 0; i < 15873; i++)
+  for (int i = 0; i < 16384-512+1; i++)
   {
     myChar = SPI.transfer(0xFF);
     Serial.write(myChar);
