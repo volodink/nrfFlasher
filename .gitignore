@@ -214,3 +214,13 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 /protocol.jpg
+*.name
+software/.idea/encodings.xml
+software/.idea/inspectionProfiles/profiles_settings.xml
+software/.idea/workspace.xml
+software/.idea/vcs.xml
+software/.idea/software.iml
+software/.idea/scopes/scope_settings.xml
+software/.idea/modules.xml
+software/.idea/misc.xml
+software/.idea/inspectionProfiles/Project_Default.xml
