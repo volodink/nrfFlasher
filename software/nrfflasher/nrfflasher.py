@@ -101,19 +101,35 @@ def main():
 		sleep(.9)
 		answer = serial_port.read(2)
 		if answer <> 'OK':
-			print 'Size transmissin error!'
+			print 'Size transmission error!'
 			exit(6)
 		serial_port.write('L')
 		answer = serial_port.read(7)
 		if answer[-2:] <> 'OK':
-			print 'Size transmissin error!'
+			print 'Size transmission error!'
 			exit(6)
 		answer = answer[:-2]
 		if int(answer) <> len(data):
 			print 'Size != size!'
 			exit(6)
-		if debug: print 'REcived size: %s' % answer
+		if debug: print 'Recived file size: %s' % answer
 		# W bin_stream
+		serial_port.write('F')
+		sleep(.1)		
+		for i, j in zip(data, range(0, len(data))):
+			serial_port.write(i)
+			if ((j == 512) or (j == 1024) or (j == 1024+512) or (j == 1024+1024) or (j == 2048+512)):
+				sleep(1)
+		sleep(1)
+		answer = serial_port.read(2)
+		if answer == 'OK':
+			print 'Writing success.'
+			exit(0)
+		else:
+			print 'Writing error!'
+			exit(3)
+
+		
 	
 	if 'v' in start_args: # Verify
 		print 'Verifying...'

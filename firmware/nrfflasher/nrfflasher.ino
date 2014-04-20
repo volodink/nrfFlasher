@@ -22,6 +22,8 @@
 #define PROGRAM 0x02
 #define READ 0x03
 
+//#define START_PROGRAM() { digitalWrite(FCSN, LOW); SPI.transfer(WREN); digitalWrite(FCSN, HIGH); delay(1); digitalWrite(FCSN, LOW); SPI.transfer(PROGRAM); }
+
 // Creating strings in atmega's ROM
 FLASH_STRING(nrfflasher_version, "0.0.1");
 FLASH_STRING(erasing,      "\nErasing...\n");
@@ -107,6 +109,10 @@ void reset()
       resetting.print(Serial);
     #endif
     // resetting
+    digitalWrite(NRF_RESET, LOW);
+    delay(100);
+    digitalWrite(NRF_RESET, HIGH);
+    delay(100);
     #if DEBUG == 1
       resetting_ok.print(Serial);
     #endif
@@ -192,23 +198,127 @@ void receive_flash_size()
   #endif
 }
 
+//unsigned char data_array[512];
+
 /**
 */
 void receive_flash_data()
 {
+  unsigned int address = 0;
+  unsigned char myChar;
+
   #if DEBUG == 1
     Serial.print("Waiting for data...");
   #endif
-  // receive flash data
-  /*
-  if (Serial.available() > 0)
+  
+  // begin writing
+  digitalWrite(NRF_PROG, HIGH);
+  delay(100);
+  digitalWrite(NRF_RESET, LOW);
+  delay(1);
+  digitalWrite(NRF_RESET, HIGH);
+  delay(1);
+  
+  while (firmwareFlashSize > 0)
   {
-    while (Serial.available() > 0)
-    {
-      
-    }
-  }  
-  */
+      if (firmwareFlashSize <= 512)
+      {  
+         //Serial.print("section 1\n");
+         // start writing page
+         digitalWrite(FCSN, LOW); SPI.transfer(WREN); digitalWrite(FCSN, HIGH); delay(1); digitalWrite(FCSN, LOW); SPI.transfer(PROGRAM);
+         
+         // set address
+         // low byte
+         SPI.transfer((unsigned char) (address & 0xFF));
+         // high byte
+         SPI.transfer((unsigned char) ((address & 0xFF00) >> 8));   
+         delay(1);
+         
+         // get and write data
+         for (int i = 0; i < firmwareFlashSize; i++)
+         {
+           myChar = Serial.read();
+           delay(1);
+           SPI.transfer(myChar);
+           delay(1);          
+         }
+                  
+         // end writing
+         digitalWrite(FCSN, HIGH); delay(100);
+         
+         // increment page;
+         //Serial.println(address);
+         //Serial.print("\n");
+         //address = address + 0x02;
+         //Serial.println(address);
+         //Serial.print("\n");
+         //Serial.println(firmwareFlashSize);
+         //Serial.print("\n");
+         firmwareFlashSize = 0;         
+         //Serial.print(firmwareFlashSize);
+         //Serial.print("\n");    
+      }
+      else
+      {  // if flash size greater than one page
+         
+         //Serial.print("section 2\n");
+         // start writing page
+         digitalWrite(FCSN, LOW); SPI.transfer(WREN); digitalWrite(FCSN, HIGH); delay(1); digitalWrite(FCSN, LOW); SPI.transfer(PROGRAM);
+         
+         // set address
+         
+        // Serial.print("Low: ");
+        //   myChar = address & 0xFF;
+         //  Serial.println(myChar);
+        // Serial.print("High: ");
+        //   myChar = (address & 0xFF00) >> 8;
+        //   Serial.println(myChar);
+         
+         // low byte
+         SPI.transfer((unsigned char) (address & 0xFF));
+         // high byte
+         SPI.transfer((unsigned char) ((address & 0xFF00) >> 8));   
+         delay(1);
+         
+         // get and write data
+         
+         for (int i = 0; i < 512; i++)
+         {
+           myChar = Serial.read();
+           delay(1);
+           SPI.transfer(myChar);
+           delay(1);          
+         }
+         
+         // end writing
+         digitalWrite(FCSN, HIGH); delay(100);
+         
+         // increment page;
+         //Serial.println(address);
+         //Serial.println("\n");
+         address = address + 0x02;
+         //Serial.println(address);
+         //Serial.println("\n");
+         
+         // decrement flash size counter
+         firmwareFlashSize = firmwareFlashSize - 512;
+         //Serial.println(firmwareFlashSize);
+         //Serial.println("\n");
+      }
+ }  
+    // set address
+    // low byte
+    //  SPI.transfer((unsigned char) (address & 0xFF));
+    // high byte
+    //  SPI.transfer((unsigned char) ((address >> 8) & 0xFF));      
+    
+  
+  // finish writing
+  digitalWrite(NRF_PROG, LOW);
+  delay(100);
+  digitalWrite(NRF_RESET, HIGH);
+  delay(100);
+ 
   #if DEBUG == 1
     Serial.print("Got data ok.");
   #endif
@@ -242,7 +352,10 @@ void setup()
 	
 	digitalWrite(NRF_RESET, HIGH);  
 	
-	// Start delay
+	//for (int i = 0; i < 512; i++) data_array[i] = 0;
+
+
+        // Start delay
 	delay(100);
 	
 	// Ready to go!
