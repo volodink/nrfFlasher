@@ -242,6 +242,8 @@ void receive_flash_data()
            SPI.transfer(myChar);
            delay(1);          
          }
+         
+         
                   
          // end writing
          digitalWrite(FCSN, HIGH); delay(100);
