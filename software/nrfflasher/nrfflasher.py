@@ -2,6 +2,7 @@
 import serial
 from time import sleep
 from sys import argv
+import os
 
 open_port_delay = 1.7
 
@@ -96,7 +97,12 @@ def main():
 		if not 'file' in start_args:
 			print 'Get the file!'
 			exit(5)
-		data = open(start_args['file'], 'rb').read()
+		if start_args['file'][-4:] == '.hex':
+			os.system('hex2bin.exe %s' % start_args['file'])
+			data = open(start_args['file'][:-3]+'bin', 'rb').read()
+			os.remove(start_args['file'][:-3]+'bin')
+		else:
+			data = open(start_args['file'], 'rb').read()
 		serial_port.write('S%i' % len(data))
 		sleep(.9)
 		answer = serial_port.read(2)
@@ -141,7 +147,12 @@ def main():
 		if not 'file' in start_args:
 			print 'Get the file!'
 			exit(5)
-		reference_data = open(start_args['file'], 'rb').read()
+		if start_args['file'][-4:] == '.hex':
+			os.system('hex2bin.exe %s' % start_args['file'])
+			reference_data = open(start_args['file'][:-3]+'bin', 'rb').read()
+			os.remove(start_args['file'][:-3]+'bin')
+		else:
+			reference_data = open(start_args['file'], 'rb').read()
 		serial_port.write('R')
 		answer = ''
 		for i in range(512 * 16):
