@@ -37,7 +37,7 @@ def main():
 	if 'verbose' in start_args: debug = True
 	else: debug = False
 	if ('h' in start_args) or (not (('w' in start_args) or ('e' in start_args) or ('r' in start_args) or ('v' in start_args))): # Help
-		print "Don't wait help."
+		print "Don't wait for help."
 		exit(0)
 	if ((('w' in start_args) and ('r' in start_args)) or
 		(('w' in start_args) and ('e' in start_args)) or
