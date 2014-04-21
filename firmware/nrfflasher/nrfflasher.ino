@@ -261,7 +261,7 @@ void receive_flash_data()
          firmwareFlashSize_l = 0;         
          //Serial.print(firmwareFlashSize);
          //Serial.print("\n");    
-         Serial.print("ACK");
+         //Serial.print("ACK");
       }
       else
       {  // if flash size greater than one page
