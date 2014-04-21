@@ -115,11 +115,15 @@ def main():
 		if debug: print 'Recived file size: %s' % answer
 		# W bin_stream
 		serial_port.write('F')
-		sleep(.1)		
-		for i, j in zip(data, range(0, len(data))):
-			serial_port.write(i)
-			if ((j == 512) or (j == 1024) or (j == 1024+512) or (j == 1024+1024) or (j == 2048+512)):
-				sleep(1)
+		sleep(.1)
+		for i, char in enumerate(data):
+			serial_port.write(char)
+			sleep(.005)
+			if (i > 0) and not (i % 512):
+				for j in range(10):
+					answer = serial_port.read(3)
+					if answer == 'ACK': break
+				if debug: print answer
 		sleep(1)
 		answer = serial_port.read(2)
 		if answer == 'OK':
@@ -127,6 +131,7 @@ def main():
 			exit(0)
 		else:
 			print 'Writing error!'
+			if debug: print '\n%s\n' % answer
 			exit(3)
 
 		

@@ -219,10 +219,12 @@ void receive_flash_data()
   digitalWrite(NRF_RESET, HIGH);
   delay(1);
   
-  while (firmwareFlashSize > 0)
+  unsigned long int firmwareFlashSize_l = firmwareFlashSize;
+  while (firmwareFlashSize_l > 0)
   {
-      if (firmwareFlashSize <= 512)
+      if (firmwareFlashSize_l <= 512)
       {  
+         //while(!(Serial.available())); 
          //Serial.print("section 1\n");
          // start writing page
          digitalWrite(FCSN, LOW); SPI.transfer(WREN); digitalWrite(FCSN, HIGH); delay(1); digitalWrite(FCSN, LOW); SPI.transfer(PROGRAM);
@@ -235,15 +237,15 @@ void receive_flash_data()
          delay(1);
          
          // get and write data
-         for (int i = 0; i < firmwareFlashSize; i++)
+         for (int i = 0; i < firmwareFlashSize_l; i++)
          {
+           while(!Serial.available());
            myChar = Serial.read();
            delay(1);
            SPI.transfer(myChar);
-           delay(1);          
-         }
-         
-         
+           delay(1);
+           //if (i % 32 == 0) Serial.write("A");                    
+         }        
                   
          // end writing
          digitalWrite(FCSN, HIGH); delay(100);
@@ -256,12 +258,14 @@ void receive_flash_data()
          //Serial.print("\n");
          //Serial.println(firmwareFlashSize);
          //Serial.print("\n");
-         firmwareFlashSize = 0;         
+         firmwareFlashSize_l = 0;         
          //Serial.print(firmwareFlashSize);
          //Serial.print("\n");    
+         Serial.print("ACK");
       }
       else
       {  // if flash size greater than one page
+         //while(!(Serial.available()));
          
          //Serial.print("section 2\n");
          // start writing page
@@ -286,10 +290,12 @@ void receive_flash_data()
          
          for (int i = 0; i < 512; i++)
          {
+           while(!Serial.available());
            myChar = Serial.read();
            delay(1);
            SPI.transfer(myChar);
-           delay(1);          
+           delay(1);
+           //if (i % 32 == 0) Serial.write("A");          
          }
          
          // end writing
@@ -303,9 +309,10 @@ void receive_flash_data()
          //Serial.println("\n");
          
          // decrement flash size counter
-         firmwareFlashSize = firmwareFlashSize - 512;
+         firmwareFlashSize_l = firmwareFlashSize_l - 512;
          //Serial.println(firmwareFlashSize);
          //Serial.println("\n");
+         Serial.print("ACK");
       }
  }  
     // set address
