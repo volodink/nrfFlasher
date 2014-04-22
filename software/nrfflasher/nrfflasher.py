@@ -150,22 +150,8 @@ def main():
 			print 'Writing error!'
 			if debug: print '\n%s\n' % answer
 			exit(3)
-		print 'Verifying...'
-		serial_port.write('R')
-		answer = ''
-		for i in range(512 * 16):
-			answer += serial_port.read(32)
-			if answer[-2:] == 'OK': break
-			# Timeout handler
-		if answer[-2:] <> 'OK':
-			print 'Reading error!'
-			exit(4)
-		if data == answer[:len(data)]:
-			print 'Verification success!'
-		else:
-			print 'Verification failed!'
 
-	if 'v' in start_args: # Verify
+	if ('v' in start_args) and not ('e' in start_args): # Verify
 		print 'Verifying...'
 		if not 'file' in start_args:
 			print 'Get the file!'
