@@ -5,10 +5,10 @@ arduino based flasher/burner for nrf24le1 + python pc-side flash utility.
 
 Usage:
 
-=Erase chip (without InfoPage)
+Erase chip (without InfoPage)
 nrfflasher.exe -e
 
-=Write firmware to chip
+Write firmware to chip
 nrfflasher.exe -w -file myhex.hex
 
 
