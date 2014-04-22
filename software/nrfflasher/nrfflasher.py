@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 import serial
 from time import sleep
-from sys import argv
+from sys import argv, exit
 import os
 
 open_port_delay = 1.7
@@ -67,7 +67,7 @@ def main():
 		sleep(5)
 		answer = serial_port.read(2)
 		if answer == 'OK':
-			print 'Yahoo!'
+			print 'Erasing complete!'
 			exit(0)
 		else:
 			print 'Erasing error!'
@@ -93,6 +93,17 @@ def main():
 		open(start_args['file'], 'wb').write(answer)
 
 	if 'w' in start_args: # Write
+		print 'Erasing...'
+		serial_port.write('E')
+		#serial_port.timeout = 5 # Fuck!
+		sleep(5)
+		answer = serial_port.read(2)
+		if answer == 'OK':
+			print 'Erasing complete!'
+			sleep(0.1)
+		else:
+			print 'Erasing error!'
+			exit(3)
 		print 'Writing...'
 		if not 'file' in start_args:
 			print 'Get the file!'
@@ -121,7 +132,7 @@ def main():
 		if debug: print 'Recived file size: %s' % answer
 		# W bin_stream
 		serial_port.write('F')
-		sleep(.1)
+		sleep(0.1)
 		for i, char in enumerate(data):
 			serial_port.write(char)
 			sleep(.005)
@@ -134,14 +145,26 @@ def main():
 		answer = serial_port.read(2)
 		if answer == 'OK':
 			print 'Writing success.'
-			exit(0)
+			sleep(0.1)
 		else:
 			print 'Writing error!'
 			if debug: print '\n%s\n' % answer
 			exit(3)
+		print 'Verifying...'
+		serial_port.write('R')
+		answer = ''
+		for i in range(512 * 16):
+			answer += serial_port.read(32)
+			if answer[-2:] == 'OK': break
+			# Timeout handler
+		if answer[-2:] <> 'OK':
+			print 'Reading error!'
+			exit(4)
+		if data == answer[:len(data)]:
+			print 'Verification success!'
+		else:
+			print 'Verification failed!'
 
-		
-	
 	if 'v' in start_args: # Verify
 		print 'Verifying...'
 		if not 'file' in start_args:
